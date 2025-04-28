@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { CreditCard, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 const Checkout: React.FC = () => {
   const { items, total, clearCart } = useCart();
@@ -82,9 +83,10 @@ const Checkout: React.FC = () => {
 
       console.log('Éléments à insérer:', orderItems);
 
-      const { error: itemsError } = await supabase
+      const { data: insertedOrderItems, error: itemsError } = await supabase
         .from('order_items')
-        .insert(orderItems);
+        .insert(orderItems)
+        .select();
 
       if (itemsError) {
         console.error('Erreur lors de la création des éléments de la commande:', itemsError);
@@ -92,6 +94,31 @@ const Checkout: React.FC = () => {
       }
 
       console.log('Éléments de la commande créés avec succès');
+
+      // 3. Générer les codes QR pour chaque ticket acheté
+      let ticketCodes: { code: string }[] = [];
+      const { data: codesData } = await supabase
+        .from('ticket_codes')
+        .select('code')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (codesData) {
+        ticketCodes = codesData.map((c: any) => ({ code: c.code }));
+      }
+
+      for (const orderItem of insertedOrderItems) {
+        if (orderItem.product_type === 'ticket') {
+          for (let i = 0; i < orderItem.quantity; i++) {
+            const code = uuidv4();
+            await supabase.from('ticket_codes').insert({
+              order_item_id: orderItem.id,
+              user_id: user.id,
+              code
+            });
+          }
+        }
+      }
 
       // Simuler un paiement réussi
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -102,13 +129,14 @@ const Checkout: React.FC = () => {
       console.log('Paiement terminé avec succès');
 
       // Envoi de l'email de confirmation
-      if (user?.email) {
+      if (user?.email && ticketCodes.length > 0) {
         fetch('http://localhost:3005/api/send-confirmation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: user.email,
             name: user.user_metadata?.name || '',
+            tickets: ticketCodes,
           }),
         });
       }

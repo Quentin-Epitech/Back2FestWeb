@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { User, Package, X } from 'lucide-react';
+import { User, Package, X, QrCode } from 'lucide-react';
+import QRCode from 'qrcode.react';
 
 interface Order {
   id: string;
@@ -18,11 +19,19 @@ interface OrderItem {
   product_name?: string;
 }
 
+interface TicketCode {
+  id: string;
+  code: string;
+  created_at: string;
+  order_item_id: string;
+}
+
 const UserProfile: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [user, setUser] = useState<any>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [ticketCodes, setTicketCodes] = useState<TicketCode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'info' | 'orders'>('info');
+  const [activeTab, setActiveTab] = useState<'info' | 'orders' | 'tickets'>('info');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -42,6 +51,13 @@ const UserProfile: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         if (!error && ordersData) {
           setOrders(ordersData);
         }
+
+        const { data: codes } = await supabase
+          .from('ticket_codes')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        setTicketCodes(codes || []);
       }
       setLoading(false);
     };
@@ -93,6 +109,19 @@ const UserProfile: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             <div className="flex items-center gap-2">
               <Package size={20} />
               Mes commandes
+            </div>
+          </button>
+          <button
+            className={`px-4 py-2 font-medium ${
+              activeTab === 'tickets'
+                ? 'text-primary border-b-2 border-primary'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+            onClick={() => setActiveTab('tickets')}
+          >
+            <div className="flex items-center gap-2">
+              <QrCode size={20} />
+              Mes places
             </div>
           </button>
         </div>
@@ -163,6 +192,25 @@ const UserProfile: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   </div>
                 </div>
               ))
+            )}
+          </div>
+        )}
+
+        {activeTab === 'tickets' && (
+          <div className="space-y-6">
+            <h3 className="text-xl font-bold text-secondary-dark mb-4 text-center">Mes billets électroniques</h3>
+            {ticketCodes.length === 0 ? (
+              <p className="text-gray-600 text-center py-8">Aucun billet généré pour l'instant.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {ticketCodes.map((code) => (
+                  <div key={code.id} className="flex flex-col items-center border rounded-lg p-6 bg-gray-50">
+                    <QRCode value={code.code} size={128} />
+                    <p className="mt-4 font-mono text-xs break-all">{code.code}</p>
+                    <p className="text-gray-500 text-xs mt-2">Généré le {new Date(code.created_at).toLocaleDateString('fr-FR')}</p>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}

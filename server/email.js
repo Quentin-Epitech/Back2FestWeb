@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Resend } = require('resend');
+const QRCode = require('qrcode');
 
 const app = express();
 app.use(express.json());
@@ -10,8 +11,22 @@ app.use(cors());
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.post('/api/send-confirmation', async (req, res) => {
-  const { to, name } = req.body;
+  const { to, name, tickets } = req.body;
   if (!to) return res.status(400).json({ error: 'Email requis' });
+
+  let qrHtml = '';
+  if (tickets && tickets.length > 0) {
+    qrHtml = '<h3>Voici vos billets électroniques :</h3>';
+    for (const ticket of tickets) {
+      const qrDataUrl = await QRCode.toDataURL(ticket.code);
+      qrHtml += `
+        <div style="margin-bottom:24px;">
+          <img src="${qrDataUrl}" alt="QR Code" style="width:120px;height:120px;" />
+          <div style="font-family:monospace;font-size:12px;">${ticket.code}</div>
+        </div>
+      `;
+    }
+  }
 
   try {
     await resend.emails.send({
@@ -23,6 +38,7 @@ app.post('/api/send-confirmation', async (req, res) => {
           <h2 style="color:#2962ff;">Merci ${name || ''} pour votre commande !</h2>
           <p>Votre commande a bien été enregistrée.<br>
           Nous avons hâte de vous retrouver au festival 🎉</p>
+          ${qrHtml}
           <p style="margin-top:32px;">L'équipe Back2Fest</p>
         </div>
       `,
