@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -12,12 +12,19 @@ const Checkout: React.FC = () => {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/login', { state: { from: 'checkout' } });
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, []);
 
   const handlePayment = async () => {
     if (!user || !session) {
@@ -93,6 +100,18 @@ const Checkout: React.FC = () => {
       clearCart();
       setSuccess(true);
       console.log('Paiement terminé avec succès');
+
+      // Envoi de l'email de confirmation
+      if (user?.email) {
+        fetch('http://localhost:3005/api/send-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: user.email,
+            name: user.user_metadata?.name || '',
+          }),
+        });
+      }
     } catch (err) {
       console.error('Erreur lors du paiement:', err);
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors du paiement');
@@ -103,7 +122,7 @@ const Checkout: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-gray-600">Chargement...</p>
@@ -114,8 +133,8 @@ const Checkout: React.FC = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl w-full">
           <div className="bg-white rounded-lg shadow-lg p-8 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Lock className="w-8 h-8 text-green-600" />
@@ -137,9 +156,9 @@ const Checkout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl w-full">
+        <div ref={cardRef} className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">Finaliser la commande</h2>
