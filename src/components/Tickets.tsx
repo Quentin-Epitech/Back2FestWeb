@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { supabase } from '../lib/supabase';
+import '../styles/cartButton.css';
 
 interface Ticket {
   id: string;
@@ -10,11 +11,17 @@ interface Ticket {
   features: string[];
 }
 
-const Tickets: React.FC = () => {
+interface TicketsProps {
+  triggerCartAnim?: () => void;
+}
+
+const Tickets: React.FC<TicketsProps> = ({ triggerCartAnim }) => {
   const { addItem } = useCart();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [addingId, setAddingId] = useState<string | null>(null);
+  const [successId, setSuccessId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -42,12 +49,19 @@ const Tickets: React.FC = () => {
   }, []);
 
   const handleAddToCart = (ticket: Ticket) => {
+    setAddingId(ticket.id);
     addItem({
       id: ticket.id,
       name: ticket.name,
       price: ticket.price,
       type: 'ticket'
     });
+    if (triggerCartAnim) triggerCartAnim();
+    setTimeout(() => {
+      setAddingId(null);
+      setSuccessId(ticket.id);
+      setTimeout(() => setSuccessId(null), 800);
+    }, 1000);
   };
 
   if (loading) {
@@ -117,11 +131,30 @@ const Tickets: React.FC = () => {
               </ul>
               
               <div className="text-center">
-                <button 
+                <button
+                  className={`cart-button${addingId === ticket.id ? ' adding' : ''}${successId === ticket.id ? ' success' : ''}`}
                   onClick={() => handleAddToCart(ticket)}
-                  className={`btn w-full ${index === 1 ? 'btn-primary' : 'btn-outline'}`}
+                  disabled={addingId === ticket.id}
                 >
+                  <span className="cart-icon">
+                    <svg
+                      stroke-linejoin="round"
+                      stroke-linecap="round"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      height="24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle r="1" cy="21" cx="9"></circle>
+                      <circle r="1" cy="21" cx="20"></circle>
+                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                  </span>
                   Ajouter au panier
+                  <div className="progress-bar"></div>
                 </button>
               </div>
             </div>

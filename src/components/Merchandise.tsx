@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { supabase } from '../lib/supabase';
+import '../styles/cartButton.css';
 
 interface MerchItem {
   id: string;
@@ -12,11 +13,17 @@ interface MerchItem {
   icon_name: string;
 }
 
-const Merchandise: React.FC = () => {
+interface MerchandiseProps {
+  triggerCartAnim?: () => void;
+}
+
+const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
   const { addItem } = useCart();
   const [items, setItems] = useState<MerchItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [addingId, setAddingId] = useState<string | null>(null);
+  const [successId, setSuccessId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMerchandise = async () => {
@@ -40,6 +47,7 @@ const Merchandise: React.FC = () => {
   }, []);
 
   const handleAddToCart = (item: MerchItem) => {
+    setAddingId(item.id);
     addItem({
       id: item.id,
       name: item.name,
@@ -47,6 +55,12 @@ const Merchandise: React.FC = () => {
       type: 'merch',
       image: item.image_url
     });
+    if (triggerCartAnim) triggerCartAnim();
+    setTimeout(() => {
+      setAddingId(null);
+      setSuccessId(item.id);
+      setTimeout(() => setSuccessId(null), 800);
+    }, 1000);
   };
 
   if (loading) {
@@ -94,14 +108,34 @@ const Merchandise: React.FC = () => {
               <div className="p-6">
                 <h3 className="text-xl font-bold text-secondary-dark mb-2">{item.name}</h3>
                 <p className="text-gray-600 mb-4">{item.description}</p>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-4">
                   <span className="text-2xl font-bold text-primary">{item.price}€</span>
+                </div>
+                <div className="flex justify-center">
                   <button
+                    className={`cart-button cart-button--small${addingId === item.id ? ' adding' : ''}${successId === item.id ? ' success' : ''}`}
                     onClick={() => handleAddToCart(item)}
-                    className="btn btn-primary flex items-center"
+                    disabled={addingId === item.id}
                   >
-                    <ShoppingBag className="w-5 h-5 mr-2" />
+                    <span className="cart-icon">
+                      <svg
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                        stroke-width="2"
+                        stroke="currentColor"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        height="20"
+                        width="20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle r="1" cy="21" cx="9"></circle>
+                        <circle r="1" cy="21" cx="20"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                      </svg>
+                    </span>
                     Ajouter au panier
+                    <div className="progress-bar"></div>
                   </button>
                 </div>
               </div>

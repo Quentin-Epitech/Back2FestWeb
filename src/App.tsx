@@ -14,21 +14,50 @@ import Cart from './components/Cart';
 import Login from './components/Login';
 import Register from './components/Register';
 import Checkout from './components/Checkout';
-import { CartProvider } from './context/CartContext';
+import { CartProvider, useCart } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import './App.css';
+import './styles/cartButton.css';
 
-const App: React.FC = () => {
+const MainContent: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const { items } = useCart();
+  const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  const MainContent = () => (
+  return (
     <>
       <Navbar />
       <button
         onClick={() => setIsCartOpen(!isCartOpen)}
-        className="fixed bottom-4 right-4 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary-dark transition-colors z-40"
+        className="fixed bottom-4 right-4 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary-dark transition-colors z-40 cart-fab"
+        aria-label="Ouvrir le panier"
+        style={{ position: 'fixed', bottom: 16, right: 16 }}
       >
         <ShoppingCart size={24} />
+        {totalCount > 0 && (
+          <span
+            style={{
+              position: 'absolute',
+              top: 6,
+              right: 6,
+              background: '#e53935',
+              color: 'white',
+              borderRadius: '50%',
+              minWidth: 22,
+              height: 22,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 13,
+              fontWeight: 700,
+              boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+              zIndex: 50,
+              padding: '0 6px',
+            }}
+          >
+            {totalCount}
+          </span>
+        )}
       </button>
       {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} />}
       <Hero />
@@ -40,7 +69,9 @@ const App: React.FC = () => {
       <Venue />
     </>
   );
+};
 
+const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
