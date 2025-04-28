@@ -1,45 +1,67 @@
 import React from 'react';
 import { Check } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const Tickets: React.FC = () => {
+  const { addItem } = useCart();
+
   const ticketTypes = [
     {
+      id: 'ticket-1',
       name: 'Pass 1 Jour',
-      price: '39',
+      price: 49,
       features: [
         'Accès à toutes les scènes',
-        'Accès aux espaces restauration',
-        'Jour au choix',
-        'Application mobile de Rapocalypse',
-      ],
-      isPrimary: false,
-    },
-    {
-      name: 'Pass 3 Jours',
-      price: '110',
-      features: [
-        'Accès à toutes les scènes (3 jours)',
-        'Accès aux espaces restauration',
+        'Programme détaillé',
         'Goodies exclusifs',
-        'Application mobile de Rapocalypse',
-        'Accès prioritaire aux scènes',
+        'Accès aux zones de restauration',
+        'Toilettes VIP'
       ],
-      isPrimary: true,
+      isPrimary: false
     },
     {
-      name: 'Pass VIP',
-      price: '250',
+      id: 'ticket-2',
+      name: 'Pass 3 Jours',
+      price: 129,
       features: [
-        'Accès à toutes les scènes (3 jours)',
-        'Accès à l\'espace VIP avec bar dédié',
-        'Meet & Greet avec artistes sélectionnés',
-        'Goodies exclusifs premium',
-        'Accès backstage (zones sélectionnées)',
-        'Parking réservé',
+        'Accès à toutes les scènes',
+        'Programme détaillé',
+        'Goodies exclusifs',
+        'Accès aux zones de restauration',
+        'Toilettes VIP',
+        'Zone de repos dédiée',
+        'Rencontres avec les artistes'
       ],
-      isPrimary: false,
+      isPrimary: true
     },
+    {
+      id: 'ticket-3',
+      name: 'Pass VIP',
+      price: 299,
+      features: [
+        'Accès à toutes les scènes',
+        'Programme détaillé',
+        'Goodies exclusifs',
+        'Accès aux zones de restauration',
+        'Toilettes VIP',
+        'Zone de repos dédiée',
+        'Rencontres avec les artistes',
+        'Accès backstage',
+        'Buffet VIP',
+        'Service de conciergerie'
+      ],
+      isPrimary: false
+    }
   ];
+
+  const handleAddToCart = (ticket: typeof ticketTypes[0]) => {
+    addItem({
+      id: ticket.id,
+      name: ticket.name,
+      price: ticket.price,
+      type: 'ticket'
+    });
+  };
 
   return (
     <section id="tickets" className="section-padding bg-white">
@@ -53,9 +75,9 @@ const Tickets: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {ticketTypes.map((ticket, index) => (
+          {ticketTypes.map((ticket) => (
             <div 
-              key={index} 
+              key={ticket.id} 
               className={`card p-6 border-t-4 ${
                 ticket.isPrimary 
                   ? 'border-primary transform md:-translate-y-4 md:scale-105 shadow-lg' 
@@ -88,9 +110,10 @@ const Tickets: React.FC = () => {
               
               <div className="text-center">
                 <button 
+                  onClick={() => handleAddToCart(ticket)}
                   className={`btn w-full ${ticket.isPrimary ? 'btn-primary' : 'btn-outline'}`}
                 >
-                  Acheter maintenant
+                  Ajouter au panier
                 </button>
               </div>
             </div>

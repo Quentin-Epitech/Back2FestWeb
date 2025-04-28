@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
               <span className="font-bold text-xl">RAPOCALYPSE</span>
             </div>
             <p className="mb-6 text-gray-300">
-              Une expérience musicale inoubliable au cœur de Paris. Rejoignez-nous pour trois jours de célébration de la musique et de la culture.
+              Une expérience musicale inoubliable au cœur de Paris. Rejoignez-nous pour trois jours de célébration de la musique.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-300 hover:text-primary-light transition-colors">
@@ -64,7 +64,9 @@ const Footer: React.FC = () => {
               </li>
               <li className="flex items-start">
                 <MapPin className="text-primary-light mr-2 flex-shrink-0 mt-1" size={16} />
-                <span className="text-gray-300">1 Place de la Porte de Versailles, 75015 Paris, France</span>
+                <span className="text-gray-300">Paris longchamp
+2 Rte des Tribunes, 75016 Paris
+</span>
               </li>
             </ul>
           </div>

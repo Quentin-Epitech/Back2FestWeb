@@ -3,9 +3,19 @@ import { Calendar, MapPin, Music } from 'lucide-react';
 
 const Hero: React.FC = () => {
   return (
-    <section id="hero" className="hero-gradient text-white min-h-screen flex items-center relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-secondary-dark/80 to-primary-dark/80"></div>
-      <div className="container mx-auto px-4 z-10 py-24">
+    <section id="hero" className="relative text-white min-h-screen flex items-center">
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `url('https://i.imgur.com/HqRNvbK.png')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'brightness(0.6)'
+        }}
+      ></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-secondary-dark/70 to-primary-dark/70 z-10"></div>
+      <div className="container mx-auto px-4 z-20 py-24">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-block bg-primary px-4 py-2 rounded-full mb-6">
             <span className="font-bold">ÉDITION 2025</span>
@@ -20,7 +30,7 @@ const Hero: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-12">
             <div className="flex items-center gap-2">
               <Calendar className="text-primary-light" />
-              <span>18-20 Juillet 2025</span>
+              <span>18 au 20 Juillet 2025</span>
             </div>
             <div className="hidden md:block h-6 w-px bg-white/30"></div>
             <div className="flex items-center gap-2">
@@ -30,7 +40,7 @@ const Hero: React.FC = () => {
             <div className="hidden md:block h-6 w-px bg-white/30"></div>
             <div className="flex items-center gap-2">
               <Music className="text-primary-light" />
-              <span>+30 Artistes</span>
+              <span>+20 Artistes</span>
             </div>
           </div>
           

@@ -6,7 +6,7 @@ const About: React.FC = () => {
     {
       icon: <Music className="h-10 w-10 text-primary" />,
       title: "Musique Live",
-      description: "Plus de 30 artistes sur 3 scènes différentes pour une expérience musicale unique."
+      description: "Plus de 20 artistes pour une expérience musicale unique."
     },
     {
       icon: <Users className="h-10 w-10 text-primary" />,
@@ -35,10 +35,10 @@ const About: React.FC = () => {
 
         <div className="max-w-3xl mx-auto text-center mb-16">
           <p className="text-lg mb-6">
-            Créé en 2020, Rapocalypse est rapidement devenu un rendez-vous incontournable dans le monde de la musique. Chaque année, nous réunissons les meilleurs artistes nationaux et internationaux pour trois jours de célébration musicale.
+            Créé en 2023, Rapocalypse est rapidement devenu un rendez-vous incontournable dans le monde de la musique. Chaque année, nous réunissons les meilleurs artistes nationaux pour trois jours de festival de RAP.
           </p>
           <p className="text-lg">
-            Notre mission est de vous offrir une expérience unique alliant qualité musicale, confort et découvertes artistiques dans un cadre exceptionnel, tout en respectant des valeurs d'inclusion et d'éco-responsabilité.
+            Notre mission est de vous offrir une expérience unique alliant qualité musicale, confort et découvertes artistiques dans un cadre exceptionnel.
           </p>
         </div>
 

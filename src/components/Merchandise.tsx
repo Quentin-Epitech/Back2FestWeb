@@ -1,37 +1,54 @@
 import React from 'react';
 import { ShoppingBag, Wifi, Key, Shirt } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const Merchandise: React.FC = () => {
+  const { addItem } = useCart();
+
   const products = [
     {
+      id: 'merch-1',
       name: 'Porte-clé IOT',
-      price: '8',
+      price: 8,
       description: 'Porte-clé connecté avec technologie IOT intégrée',
       image: 'https://images.pexels.com/photos/1252890/pexels-photo-1252890.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       icon: <Key className="h-8 w-8 text-primary" />,
     },
     {
+      id: 'merch-2',
       name: 'Poster NFC',
-      price: '30',
+      price: 30,
       description: 'Poster exclusif avec puce NFC intégrée pour contenu interactif',
       image: 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       icon: <Wifi className="h-8 w-8 text-primary" />,
     },
     {
+      id: 'merch-3',
       name: 'Hoodie Rapocalypse',
-      price: '30',
+      price: 30,
       description: 'Hoodie confortable aux couleurs de Rapocalypse',
       image: 'https://images.pexels.com/photos/5698851/pexels-photo-5698851.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       icon: <Shirt className="h-8 w-8 text-primary" />,
     },
     {
+      id: 'merch-4',
       name: 'Bracelet Connecté',
-      price: '15',
+      price: 15,
       description: 'Bracelet connecté pour une expérience Rapocalypse interactive',
       image: 'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
       icon: <ShoppingBag className="h-8 w-8 text-primary" />,
     },
   ];
+
+  const handleAddToCart = (product: typeof products[0]) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      type: 'merch',
+      image: product.image
+    });
+  };
 
   return (
     <section id="merchandise" className="section-padding bg-white">
@@ -45,8 +62,8 @@ const Merchandise: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product, index) => (
-            <div key={index} className="card overflow-hidden group">
+          {products.map((product) => (
+            <div key={product.id} className="card overflow-hidden group">
               <div className="relative h-64 overflow-hidden">
                 <img 
                   src={product.image} 
@@ -64,7 +81,10 @@ const Merchandise: React.FC = () => {
                   <span className="text-2xl font-bold text-primary">{product.price}€</span>
                 </div>
                 <p className="text-gray-600 mb-4">{product.description}</p>
-                <button className="btn btn-primary w-full">
+                <button 
+                  onClick={() => handleAddToCart(product)}
+                  className="btn btn-primary w-full"
+                >
                   Ajouter au panier
                 </button>
               </div>

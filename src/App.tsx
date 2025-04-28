@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ShoppingCart } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -8,12 +10,27 @@ import Tickets from './components/Tickets';
 import Merchandise from './components/Merchandise';
 import Venue from './components/Venue';
 import Footer from './components/Footer';
+import Cart from './components/Cart';
+import Login from './components/Login';
+import Register from './components/Register';
+import Checkout from './components/Checkout';
+import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
 import './App.css';
 
-function App() {
-  return (
-    <div className="font-mono min-h-screen bg-gray-100">
+const App: React.FC = () => {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const MainContent = () => (
+    <>
       <Navbar />
+      <button
+        onClick={() => setIsCartOpen(!isCartOpen)}
+        className="fixed bottom-4 right-4 bg-primary text-white p-4 rounded-full shadow-lg hover:bg-primary-dark transition-colors z-40"
+      >
+        <ShoppingCart size={24} />
+      </button>
+      {isCartOpen && <Cart onClose={() => setIsCartOpen(false)} />}
       <Hero />
       <About />
       <Schedule />
@@ -22,8 +39,29 @@ function App() {
       <Merchandise />
       <Venue />
       <Footer />
-    </div>
+    </>
   );
-}
+
+  return (
+    <Router>
+      <AuthProvider>
+        <CartProvider>
+          <div className="min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<MainContent />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/checkout" element={<Checkout />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        </CartProvider>
+      </AuthProvider>
+    </Router>
+  );
+};
 
 export default App;

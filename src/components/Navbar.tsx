@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Music } from 'lucide-react';
+import { Menu, X, Music, User } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import UserMenu from './UserMenu';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [session, setSession] = useState(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -12,6 +16,20 @@ const Navbar: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const toggleMenu = () => {
@@ -37,7 +55,7 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex items-center space-x-6">
           {navLinks.map((link) => (
             <a
               key={link.name}
@@ -47,6 +65,19 @@ const Navbar: React.FC = () => {
               {link.name}
             </a>
           ))}
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="text-white hover:text-primary-light transition-colors duration-300 flex items-center gap-2"
+            >
+              <User size={20} />
+            </button>
+            {showUserMenu && (
+              <div className="absolute right-0 mt-2 w-48">
+                <UserMenu session={session} onClose={() => setShowUserMenu(false)} />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
@@ -74,6 +105,21 @@ const Navbar: React.FC = () => {
                 {link.name}
               </a>
             ))}
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                setShowUserMenu(!showUserMenu);
+              }}
+              className="w-full text-left text-white hover:text-primary-light transition-colors duration-300 flex items-center gap-2"
+            >
+              <User size={20} />
+              Mon compte
+            </button>
+            {showUserMenu && (
+              <div className="pl-4">
+                <UserMenu session={session} onClose={() => setShowUserMenu(false)} />
+              </div>
+            )}
           </div>
         </div>
       )}
