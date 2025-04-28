@@ -1,47 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { CreditCard, Lock, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Checkout: React.FC = () => {
   const { items, total, clearCart } = useCart();
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { user, loading, session } = useAuth();
+  const navigate = useNavigate();
+  const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login', { state: { from: 'checkout' } });
+    }
+  }, [user, loading, navigate]);
+
   const handlePayment = async () => {
-    if (!user) {
+    if (!user || !session) {
       setError('Vous devez être connecté pour effectuer un paiement');
       return;
     }
 
-    setLoading(true);
+    console.log('Début du processus de paiement', { 
+      userId: user.id,
+      itemsCount: items.length, 
+      total: total,
+      items: items.map(item => ({
+        id: item.id,
+        type: item.type,
+        price: item.price,
+        quantity: item.quantity
+      }))
+    });
+    
+    setProcessing(true);
     setError(null);
 
     try {
-      // Créer la commande dans la base de données
+      // 1. Créer la commande principale
+      console.log('Création de la commande...');
+      const orderData = {
+        user_id: user.id,
+        total: Number(total.toFixed(2)),
+        status: 'completed'
+      };
+      console.log('Données de la commande:', orderData);
+
       const { data: order, error: orderError } = await supabase
         .from('orders')
-        .insert([
-          {
-            user_id: user.id,
-            total: total,
-            status: 'completed',
-            items: items.map(item => ({
-              product_id: item.id,
-              product_name: item.name,
-              product_type: item.type,
-              quantity: item.quantity,
-              price: item.price
-            }))
-          }
-        ])
+        .insert([orderData])
         .select()
         .single();
 
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error('Erreur lors de la création de la commande:', orderError);
+        throw new Error(`Erreur lors de la création de la commande: ${orderError.message}`);
+      }
+
+      console.log('Commande créée avec succès:', order);
+
+      // 2. Créer les éléments de la commande
+      console.log('Création des éléments de la commande...');
+      const orderItems = items.map(item => ({
+        order_id: order.id,
+        product_type: item.type === 'merch' ? 'merchandise' : 'ticket',
+        product_id: item.id,
+        quantity: item.quantity,
+        price: Number(item.price.toFixed(2))
+      }));
+
+      console.log('Éléments à insérer:', orderItems);
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) {
+        console.error('Erreur lors de la création des éléments de la commande:', itemsError);
+        throw new Error(`Erreur lors de la création des éléments de la commande: ${itemsError.message}`);
+      }
+
+      console.log('Éléments de la commande créés avec succès');
 
       // Simuler un paiement réussi
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -49,12 +92,25 @@ const Checkout: React.FC = () => {
       // Vider le panier
       clearCart();
       setSuccess(true);
+      console.log('Paiement terminé avec succès');
     } catch (err) {
+      console.error('Erreur lors du paiement:', err);
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors du paiement');
     } finally {
-      setLoading(false);
+      setProcessing(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return (
@@ -66,14 +122,14 @@ const Checkout: React.FC = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Paiement réussi !</h2>
             <p className="text-gray-600 mb-8">
-              Votre commande a été confirmée. Vous pouvez la retrouver dans votre profil.
+              Votre commande a été confirmée. Merci de votre confiance !
             </p>
-            <a
-              href="#profile"
+            <button
+              onClick={() => navigate('/')}
               className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary-dark"
             >
-              Voir mes commandes
-            </a>
+              Retour à l'accueil
+            </button>
           </div>
         </div>
       </div>
@@ -87,13 +143,13 @@ const Checkout: React.FC = () => {
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">Finaliser la commande</h2>
-              <a
-                href="#cart"
+              <button
+                onClick={() => navigate('/cart')}
                 className="text-primary hover:text-primary-dark flex items-center"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Retour au panier
-              </a>
+              </button>
             </div>
           </div>
 
@@ -128,10 +184,10 @@ const Checkout: React.FC = () => {
 
               <button
                 onClick={handlePayment}
-                disabled={loading}
+                disabled={processing}
                 className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
               >
-                {loading ? (
+                {processing ? (
                   'Traitement en cours...'
                 ) : (
                   <>

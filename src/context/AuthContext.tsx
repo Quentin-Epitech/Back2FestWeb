@@ -1,64 +1,48 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { supabase } from '../lib/supabase';
+import { Session, User } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = async (email: string, password: string) => {
-    try {
-      // TODO: Implémenter la logique de connexion avec votre backend
-      // Pour l'instant, on simule une connexion réussie
-      setUser({
-        id: '1',
-        email,
-        name: 'Utilisateur Test'
-      });
-    } catch (error) {
-      throw new Error('Échec de la connexion');
-    }
-  };
+  useEffect(() => {
+    // Récupérer la session initiale
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-  const register = async (email: string, password: string, name: string) => {
-    try {
-      // TODO: Implémenter la logique d'inscription avec votre backend
-      // Pour l'instant, on simule une inscription réussie
-      setUser({
-        id: '1',
-        email,
-        name
-      });
-    } catch (error) {
-      throw new Error('Échec de l\'inscription');
-    }
-  };
+    // Écouter les changements d'authentification
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-  const logout = () => {
-    setUser(null);
-  };
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        session,
         isAuthenticated: !!user,
-        login,
-        register,
-        logout
+        loading
       }}
     >
       {children}

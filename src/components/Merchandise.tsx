@@ -1,105 +1,112 @@
-import React from 'react';
-import { ShoppingBag, Wifi, Key, Shirt } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { supabase } from '../lib/supabase';
+
+interface MerchItem {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  image_url: string;
+  icon_name: string;
+}
 
 const Merchandise: React.FC = () => {
   const { addItem } = useCart();
+  const [items, setItems] = useState<MerchItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const products = [
-    {
-      id: 'merch-1',
-      name: 'Porte-clé IOT',
-      price: 8,
-      description: 'Porte-clé connecté avec technologie IOT intégrée',
-      image: 'https://images.pexels.com/photos/1252890/pexels-photo-1252890.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      icon: <Key className="h-8 w-8 text-primary" />,
-    },
-    {
-      id: 'merch-2',
-      name: 'Poster NFC',
-      price: 30,
-      description: 'Poster exclusif avec puce NFC intégrée pour contenu interactif',
-      image: 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      icon: <Wifi className="h-8 w-8 text-primary" />,
-    },
-    {
-      id: 'merch-3',
-      name: 'Hoodie Rapocalypse',
-      price: 30,
-      description: 'Hoodie confortable aux couleurs de Rapocalypse',
-      image: 'https://images.pexels.com/photos/5698851/pexels-photo-5698851.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      icon: <Shirt className="h-8 w-8 text-primary" />,
-    },
-    {
-      id: 'merch-4',
-      name: 'Bracelet Connecté',
-      price: 15,
-      description: 'Bracelet connecté pour une expérience Rapocalypse interactive',
-      image: 'https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      icon: <ShoppingBag className="h-8 w-8 text-primary" />,
-    },
-  ];
+  useEffect(() => {
+    const fetchMerchandise = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('merchandise')
+          .select('*')
+          .order('price', { ascending: true });
 
-  const handleAddToCart = (product: typeof products[0]) => {
+        if (error) throw error;
+        setItems(data);
+      } catch (err) {
+        console.error('Erreur lors du chargement du merchandising:', err);
+        setError('Impossible de charger les articles');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMerchandise();
+  }, []);
+
+  const handleAddToCart = (item: MerchItem) => {
     addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
+      id: item.id,
+      name: item.name,
+      price: item.price,
       type: 'merch',
-      image: product.image
+      image: item.image_url
     });
   };
 
+  if (loading) {
+    return (
+      <section id="merchandise" className="section-padding bg-gray-50">
+        <div className="container mx-auto text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement des articles...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section id="merchandise" className="section-padding bg-gray-50">
+        <div className="container mx-auto text-center">
+          <p className="text-red-600">{error}</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section id="merchandise" className="section-padding bg-white">
+    <section id="merchandise" className="section-padding bg-gray-50">
       <div className="container mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-secondary-dark mb-4">MERCHANDISING</h2>
+          <h2 className="text-3xl font-bold text-secondary-dark mb-4">BOUTIQUE</h2>
           <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
           <p className="max-w-2xl mx-auto text-gray-600">
-            Découvrez notre collection exclusive de produits dérivés de Rapocalypse, mêlant style et technologie pour une expérience unique.
+            Découvrez notre collection exclusive de produits dérivés pour garder un souvenir inoubliable du festival.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <div key={product.id} className="card overflow-hidden group">
-              <div className="relative h-64 overflow-hidden">
-                <img 
-                  src={product.image} 
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {items.map((item) => (
+            <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="aspect-w-16 aspect-h-9">
+                <img
+                  src={item.image_url}
+                  alt={item.name}
+                  className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-secondary-dark/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
-                    {product.icon}
-                    <h3 className="text-xl font-bold text-secondary-dark ml-2">{product.name}</h3>
-                  </div>
-                  <span className="text-2xl font-bold text-primary">{product.price}€</span>
+                <h3 className="text-xl font-bold text-secondary-dark mb-2">{item.name}</h3>
+                <p className="text-gray-600 mb-4">{item.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-primary">{item.price}€</span>
+                  <button
+                    onClick={() => handleAddToCart(item)}
+                    className="btn btn-primary flex items-center"
+                  >
+                    <ShoppingBag className="w-5 h-5 mr-2" />
+                    Ajouter au panier
+                  </button>
                 </div>
-                <p className="text-gray-600 mb-4">{product.description}</p>
-                <button 
-                  onClick={() => handleAddToCart(product)}
-                  className="btn btn-primary w-full"
-                >
-                  Ajouter au panier
-                </button>
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="mt-16 max-w-2xl mx-auto p-6 bg-gray-50 rounded-lg">
-          <h3 className="text-xl font-bold text-secondary-dark mb-4 text-center">Informations</h3>
-          <ul className="space-y-2 text-gray-600">
-            <li>• Livraison gratuite pour toute commande supérieure à 50€</li>
-            <li>• Retrait possible sur place pendant Rapocalypse</li>
-            <li>• Garantie satisfait ou remboursé sous 30 jours</li>
-            <li>• Stock limité, commandez dès maintenant</li>
-          </ul>
         </div>
       </div>
     </section>

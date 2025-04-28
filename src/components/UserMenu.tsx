@@ -45,7 +45,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ session, onClose }) => {
       {session ? (
         <>
           <div className="px-4 py-2 border-b border-gray-200">
-            <p className="font-medium">{session.user.email}</p>
+            <p className="font-medium">{session.user.user_metadata?.name || 'Utilisateur'}</p>
           </div>
           <button
             onClick={() => setShowProfile(true)}

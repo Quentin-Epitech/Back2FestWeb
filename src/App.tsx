@@ -38,7 +38,6 @@ const App: React.FC = () => {
       <Tickets />
       <Merchandise />
       <Venue />
-      <Footer />
     </>
   );
 

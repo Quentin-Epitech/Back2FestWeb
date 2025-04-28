@@ -15,8 +15,8 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
-      // Rediriger vers la page de connexion
-      navigate('/login');
+      // Rediriger vers la page de connexion avec l'information de retour
+      navigate('/login', { state: { from: 'checkout' } });
       return;
     }
     // Rediriger vers la page de paiement

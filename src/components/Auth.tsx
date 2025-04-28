@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Lock, Mail, User } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AuthProps {
   onSuccess?: () => void;
@@ -13,6 +14,8 @@ const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
   const [name, setName] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +41,15 @@ const Auth: React.FC<AuthProps> = ({ onSuccess }) => {
         });
         if (error) throw error;
       }
+      
+      // Vérifier si l'utilisateur vient de la page de paiement
+      const fromCheckout = location.state?.from === 'checkout';
+      if (fromCheckout) {
+        navigate('/checkout');
+      } else {
+        navigate('/');
+      }
+      
       onSuccess?.();
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Une erreur est survenue');
