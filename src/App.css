@@ -155,3 +155,15 @@ body {
   transform: translateY(-5px);
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
+
+.card.border-blue-custom {
+  border-top: 4px solid #2962ff;
+}
+
+.card.border-violet-custom {
+  border-top: 4px solid #8D4FFA;
+}
+
+.card.border-gold-custom {
+  border-top: 4px solid #FAAA1F;
+}

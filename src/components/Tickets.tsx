@@ -100,11 +100,11 @@ const Tickets: React.FC<TicketsProps> = ({ triggerCartAnim }) => {
           {tickets.map((ticket, index) => (
             <div 
               key={ticket.id} 
-              className={`card p-6 border-t-4 ${
-                index === 1
-                  ? 'border-primary transform md:-translate-y-4 md:scale-105 shadow-lg' 
-                  : 'border-gray-200'
-              }`}
+              className={`card p-6 
+                ${index === 0 ? 'border-blue-custom' : ''}
+                ${index === 1 ? 'border-violet-custom' : ''}
+                ${index === 2 ? 'border-gold-custom' : ''}
+                `}
             >
               {index === 1 && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 text-sm font-semibold rounded-full">

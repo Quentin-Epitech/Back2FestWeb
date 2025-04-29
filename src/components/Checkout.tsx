@@ -130,7 +130,7 @@ const Checkout: React.FC = () => {
 
       // Envoi de l'email de confirmation
       if (user?.email && ticketCodes.length > 0) {
-        fetch('http://localhost:3005/api/send-confirmation', {
+        fetch('/.netlify/functions/send-confirmation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
