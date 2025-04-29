@@ -1,8 +1,0 @@
-{
-  "name": "netlify-functions",
-  "version": "1.0.0",
-  "dependencies": {
-    "resend": "^4.4.1",
-    "qrcode": "^1.5.4"
-  }
-} 
