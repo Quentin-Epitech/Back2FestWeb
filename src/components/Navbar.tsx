@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Music, User } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import UserMenu from './UserMenu';
+import type { Session } from '@supabase/supabase-js';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
@@ -50,8 +51,7 @@ const Navbar: React.FC = () => {
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-secondary-dark py-2 shadow-md' : 'bg-transparent py-4'}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center">
-          <Music className="text-white mr-2" size={28} />
-          <span className="text-white font-bold text-xl">RAPOCALYPSE</span>
+          <img src="/Rapocalypse-removebg-preview.png" alt="Rapocalypse Logo" className="h-16" />
         </div>
 
         {/* Desktop Menu */}
