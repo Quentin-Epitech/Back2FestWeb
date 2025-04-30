@@ -108,7 +108,7 @@ const Tickets: React.FC<TicketsProps> = ({ triggerCartAnim }) => {
             >
               {index === 1 && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 text-sm font-semibold rounded-full">
-                  Populaire
+                  
                 </div>
               )}
               
