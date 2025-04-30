@@ -1,27 +1,20 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
 const { Resend } = require('resend');
 const QRCode = require('qrcode');
 
+const app = express();
+app.use(express.json());
+app.use(cors());
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-exports.handler = async function(event, context) {
-  // Vérifier la méthode HTTP
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Méthode non autorisée' })
-    };
-  }
+app.post('/api/send-confirmation', async (req, res) => {
+  const { to, name, tickets } = req.body;
+  if (!to) return res.status(400).json({ error: 'Email requis' });
 
   try {
-    const { to, name, tickets } = JSON.parse(event.body);
-    
-    if (!to) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Email requis' })
-      };
-    }
-
     let qrHtml = '';
     if (tickets && tickets.length > 0) {
       qrHtml = '<h3>Voici vos billets électroniques :</h3>';
@@ -36,7 +29,7 @@ exports.handler = async function(event, context) {
       }
     }
 
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: 'Back2Fest <onboarding@resend.dev>',
       to: [to],
       subject: 'Merci pour votre commande !',
@@ -51,14 +44,18 @@ exports.handler = async function(event, context) {
       `,
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true })
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    };
+    if (error) {
+      console.error('Erreur lors de l’envoi avec Resend:', error);
+      return res.status(500).json({ error: error.message });
+    }
+
+    console.log('Email envoyé avec succès à', to);
+    res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('Erreur interne :', err);
+    res.status(500).json({ error: err.message || 'Erreur interne serveur' });
   }
-}; 
+});
+
+const PORT = 3005;
+app.listen(PORT, () => console.log(`✅ Serveur démarré sur http://localhost:${PORT}`));

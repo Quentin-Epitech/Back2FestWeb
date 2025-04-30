@@ -138,14 +138,14 @@ const Tickets: React.FC<TicketsProps> = ({ triggerCartAnim }) => {
                 >
                   <span className="cart-icon">
                     <svg
-                      stroke-linejoin="round"
-                      stroke-linecap="round"
-                      stroke-width="2"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                      strokeWidth="2"
                       stroke="currentColor"
                       fill="none"
                       viewBox="0 0 24 24"
-                      height="24"
-                      width="24"
+                      height="20"
+                      width="20"
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <circle r="1" cy="21" cx="9"></circle>
