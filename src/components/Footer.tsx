@@ -1,7 +1,5 @@
 import React from 'react';
 import { Instagram, Facebook, Twitter, Youtube, Mail, Phone, MapPin, Music } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   return (
@@ -97,15 +95,15 @@ const Footer: React.FC = () => {
               &copy; {new Date().getFullYear()} Rapocalypse. Tous droits réservés.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-primary-light text-sm transition-colors">
-                Mentions légales
+            <a href="/mentions-legales" className="text-gray-400 hover:text-primary-light text-sm transition-colors">
+              Mentions légales
+            </a>
+              <a href="/politique-de-confidentialite" className="text-gray-400 hover:text-primary-light text-sm transition-colors">
+              Politique de confidentialité
               </a>
-              <a href="#" className="text-gray-400 hover:text-primary-light text-sm transition-colors">
-                Politique de confidentialité
+              <a href="/CGV" className="text-gray-400 hover:text-primary-light text-sm transition-colors">
+                CGV
               </a>
-              <Link to="/rgpd" className="text-gray-400 hover:text-primary-light text-sm transition-colors">
-              Conditions Générales d'Utilisation
-</Link>
             </div>
           </div>
         </div>

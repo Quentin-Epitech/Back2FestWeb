@@ -16,13 +16,10 @@ import Register from './components/Register';
 import Checkout from './components/Checkout';
 import { CartProvider, useCart } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+import PolitiqueConfidentialite from './components/PolitiqueConfidentialite';
+import MentionsLegales from './components/MentionsLegales';
 import './App.css';
 import './styles/cartButton.css';
-import RGPD from './pages/RGPD';
-
-// Dans votre <Routes>
-
-
 
 const MainContent: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -89,7 +86,8 @@ const App: React.FC = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/checkout" element={<Checkout />} />
-                <Route path="/rgpd" element={<RGPD />} />
+                <Route path="/politique-de-confidentialite" element={<PolitiqueConfidentialite />} />
+                <Route path="/mentions-legales" element={<MentionsLegales />} />
               </Routes>
             </main>
             <Footer />
