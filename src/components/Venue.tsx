@@ -53,15 +53,16 @@ const Venue: React.FC = () => {
           </div>
 
           <div className="order-1 lg:order-2 h-96 rounded-lg overflow-hidden shadow-md">
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2625.6766014459687!2d2.2261843!3d48.8456099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e67abeb0f0c957%3A0x3c4145062ea8758d!2sHippodrome%20ParisLongchamp!5e0!3m2!1sen!2sfr!4v1710644160345!5m2!1sen!2sfr"
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5899.578425613339!2d2.2298259162457486!3d48.85956241452465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e665b8c9802a53%3A0x9f0e27e1e9caf620!2sHippodrome%20ParisLongchamp!5e0!3m2!1sfr!2sfr!4v1746795863711!5m2!1sfr!2sfr"
+
               width="100%" 
               height="100%" 
               style={{ border: 0 }} 
               allowFullScreen 
               loading="lazy"
               title="Carte du lieu de Rapocalypse"
-            ></iframe>
+              >
+            </iframe>
           </div>
         </div>
 
