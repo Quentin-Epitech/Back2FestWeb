@@ -15,7 +15,8 @@ interface MerchItem {
   price: number;
   description: string;
   image_url: string;
-  icon_name?: string;
+  icon_name: string;
+  sizes?: string[];
 }
 
 interface MerchImage {
@@ -36,11 +37,11 @@ const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
   const [error, setError] = useState<string | null>(null);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
+  const [selectedSizes, setSelectedSizes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Charger les produits
         const { data: merchData, error: merchError } = await supabase
           .from('merchandise')
           .select('*')
@@ -48,14 +49,16 @@ const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
 
         if (merchError) throw merchError;
         
-        // Charger les images associées
         const { data: imagesData, error: imagesError } = await supabase
           .from('merchandise_images')
           .select('*');
         
         if (imagesError) throw imagesError;
 
-        setItems(merchData);
+        setItems(merchData.map(item => ({
+          ...item,
+          sizes: item.sizes || []
+        })));
         setMerchImages(imagesData);
       } catch (err) {
         console.error('Erreur lors du chargement des données:', err);
@@ -69,29 +72,36 @@ const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
   }, []);
 
   const getProductImages = (productId: string) => {
-    // Filtrer les images pour ce produit
     const productImages = merchImages.filter(img => img.merchandise_id === productId);
     
-    // Si aucune image supplémentaire n'est trouvée, utiliser l'image principale du produit
     if (productImages.length === 0) {
       const product = items.find(item => item.id === productId);
       return product ? [{ id: 'main', merchandise_id: productId, image_url: product.image_url }] : [];
     }
     
-    // Sinon retourner toutes les images associées
     return productImages;
   };
 
   const handleAddToCart = (item: MerchItem) => {
+    const size = item.icon_name === 'Size' ? selectedSizes[item.id] : undefined;
+    
+    if (item.icon_name === 'Size' && !size) {
+      alert('Veuillez sélectionner une taille');
+      return;
+    }
+
     setAddingId(item.id);
     addItem({
       id: item.id,
       name: item.name,
       price: item.price,
       type: 'merch',
-      image: item.image_url
+      image: item.image_url,
+      size
     });
+    
     if (triggerCartAnim) triggerCartAnim();
+    
     setTimeout(() => {
       setAddingId(null);
       setSuccessId(item.id);
@@ -138,14 +148,12 @@ const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
             return (
               <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="relative">
-                  {/* Carrousel d'images avec Swiper */}
                   <Swiper
                     modules={[Navigation, Pagination]}
                     navigation
                     pagination={{ clickable: true }}
                     className="mySwiper"
                   >
-                    {/* Image principale du produit */}
                     <SwiperSlide>
                       <div className="aspect-w-16 aspect-h-9">
                         <img
@@ -156,7 +164,6 @@ const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
                       </div>
                     </SwiperSlide>
                     
-                    {/* Images supplémentaires du produit */}
                     {productImages.map((image) => (
                       <SwiperSlide key={image.id}>
                         <div className="aspect-w-16 aspect-h-9">
@@ -177,6 +184,30 @@ const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-2xl font-bold text-primary">{item.price}€</span>
                   </div>
+
+                  {item.icon_name === 'Size' && (
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Taille
+                      </label>
+                      <select
+                        value={selectedSizes[item.id] || ''}
+                        onChange={(e) => setSelectedSizes({
+                          ...selectedSizes,
+                          [item.id]: e.target.value
+                        })}
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                      >
+                        <option value="">Sélectionner une taille</option>
+                        {item.sizes?.map((size) => (
+                          <option key={size} value={size}>
+                            {size}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                   <div className="flex justify-center">
                     <button
                       className={`cart-button cart-button--small${addingId === item.id ? ' adding' : ''}${successId === item.id ? ' success' : ''}`}
@@ -184,21 +215,7 @@ const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
                       disabled={addingId === item.id}
                     >
                       <span className="cart-icon">
-                        <svg
-                          strokeLinejoin="round"
-                          strokeLinecap="round"
-                          strokeWidth="2"
-                          stroke="currentColor"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          height="20"
-                          width="20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <circle r="1" cy="21" cx="9"></circle>
-                          <circle r="1" cy="21" cx="20"></circle>
-                          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                        </svg>
+                        <ShoppingBag size={20} />
                       </span>
                       Ajouter au panier
                       <div className="progress-bar"></div>

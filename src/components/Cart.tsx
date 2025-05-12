@@ -15,11 +15,9 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
-      // Rediriger vers la page de connexion avec l'information de retour
       navigate('/login', { state: { from: 'checkout' } });
       return;
     }
-    // Rediriger vers la page de paiement
     navigate('/checkout');
   };
 
@@ -43,7 +41,7 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
         ) : (
           <div className="space-y-4">
             {items.map((item) => (
-              <div key={item.id} className="flex items-center space-x-4 p-2 border rounded">
+              <div key={`${item.id}-${item.size || 'default'}`} className="flex items-center space-x-4 p-2 border rounded">
                 {item.image && (
                   <img
                     src={item.image}
@@ -53,17 +51,20 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
                 )}
                 <div className="flex-1">
                   <h3 className="font-semibold">{item.name}</h3>
+                  {item.size && (
+                    <p className="text-sm text-gray-500">Taille: {item.size}</p>
+                  )}
                   <p className="text-primary">{item.price}€</p>
                   <div className="flex items-center space-x-2 mt-2">
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => updateQuantity(item.id, item.quantity - 1, item.size)}
                       className="p-1 rounded-full hover:bg-gray-100"
                     >
                       <Minus size={16} />
                     </button>
                     <span>{item.quantity}</span>
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => updateQuantity(item.id, item.quantity + 1, item.size)}
                       className="p-1 rounded-full hover:bg-gray-100"
                     >
                       <Plus size={16} />
@@ -71,7 +72,7 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
                   </div>
                 </div>
                 <button
-                  onClick={() => removeItem(item.id)}
+                  onClick={() => removeItem(item.id, item.size)}
                   className="text-red-500 hover:text-red-700"
                 >
                   <X size={20} />
@@ -98,4 +99,4 @@ const Cart: React.FC<CartProps> = ({ onClose }) => {
   );
 };
 
-export default Cart; 
+export default Cart;
