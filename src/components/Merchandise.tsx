@@ -1,3 +1,8 @@
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -10,7 +15,13 @@ interface MerchItem {
   price: number;
   description: string;
   image_url: string;
-  icon_name: string;
+  icon_name?: string;
+}
+
+interface MerchImage {
+  id: string;
+  merchandise_id: string;
+  image_url: string;
 }
 
 interface MerchandiseProps {
@@ -20,31 +31,56 @@ interface MerchandiseProps {
 const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
   const { addItem } = useCart();
   const [items, setItems] = useState<MerchItem[]>([]);
+  const [merchImages, setMerchImages] = useState<MerchImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMerchandise = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await supabase
+        // Charger les produits
+        const { data: merchData, error: merchError } = await supabase
           .from('merchandise')
           .select('*')
           .order('price', { ascending: true });
 
-        if (error) throw error;
-        setItems(data);
+        if (merchError) throw merchError;
+        
+        // Charger les images associées
+        const { data: imagesData, error: imagesError } = await supabase
+          .from('merchandise_images')
+          .select('*');
+        
+        if (imagesError) throw imagesError;
+
+        setItems(merchData);
+        setMerchImages(imagesData);
       } catch (err) {
-        console.error('Erreur lors du chargement du merchandising:', err);
+        console.error('Erreur lors du chargement des données:', err);
         setError('Impossible de charger les articles');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMerchandise();
+    fetchData();
   }, []);
+
+  const getProductImages = (productId: string) => {
+    // Filtrer les images pour ce produit
+    const productImages = merchImages.filter(img => img.merchandise_id === productId);
+    
+    // Si aucune image supplémentaire n'est trouvée, utiliser l'image principale du produit
+    if (productImages.length === 0) {
+      const product = items.find(item => item.id === productId);
+      return product ? [{ id: 'main', merchandise_id: productId, image_url: product.image_url }] : [];
+    }
+    
+    // Sinon retourner toutes les images associées
+    return productImages;
+  };
 
   const handleAddToCart = (item: MerchItem) => {
     setAddingId(item.id);
@@ -96,51 +132,82 @@ const Merchandise: React.FC<MerchandiseProps> = ({ triggerCartAnim }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="aspect-w-16 aspect-h-9">
-                <img
-                  src={item.image_url}
-                  alt={item.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-secondary-dark mb-2">{item.name}</h3>
-                <p className="text-gray-600 mb-4">{item.description}</p>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl font-bold text-primary">{item.price}€</span>
-                </div>
-                <div className="flex justify-center">
-                  <button
-                    className={`cart-button cart-button--small${addingId === item.id ? ' adding' : ''}${successId === item.id ? ' success' : ''}`}
-                    onClick={() => handleAddToCart(item)}
-                    disabled={addingId === item.id}
+          {items.map((item) => {
+            const productImages = getProductImages(item.id);
+            
+            return (
+              <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="relative">
+                  {/* Carrousel d'images avec Swiper */}
+                  <Swiper
+                    modules={[Navigation, Pagination]}
+                    navigation
+                    pagination={{ clickable: true }}
+                    className="mySwiper"
                   >
-                    <span className="cart-icon">
-                      <svg
-                        strokeLinejoin="round"
-                        strokeLinecap="round"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        height="20"
-                        width="20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <circle r="1" cy="21" cx="9"></circle>
-                        <circle r="1" cy="21" cx="20"></circle>
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                      </svg>
-                    </span>
-                    Ajouter au panier
-                    <div className="progress-bar"></div>
-                  </button>
+                    {/* Image principale du produit */}
+                    <SwiperSlide>
+                      <div className="aspect-w-16 aspect-h-9">
+                        <img
+                          src={item.image_url}
+                          alt={`${item.name} - Image principale`}
+                          className="w-full h-64 object-cover"
+                        />
+                      </div>
+                    </SwiperSlide>
+                    
+                    {/* Images supplémentaires du produit */}
+                    {productImages.map((image) => (
+                      <SwiperSlide key={image.id}>
+                        <div className="aspect-w-16 aspect-h-9">
+                          <img
+                            src={image.image_url}
+                            alt={`${item.name} - Image supplémentaire`}
+                            className="w-full h-64 object-cover"
+                          />
+                        </div>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </div>
+                
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-secondary-dark mb-2">{item.name}</h3>
+                  <p className="text-gray-600 mb-4">{item.description}</p>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-2xl font-bold text-primary">{item.price}€</span>
+                  </div>
+                  <div className="flex justify-center">
+                    <button
+                      className={`cart-button cart-button--small${addingId === item.id ? ' adding' : ''}${successId === item.id ? ' success' : ''}`}
+                      onClick={() => handleAddToCart(item)}
+                      disabled={addingId === item.id}
+                    >
+                      <span className="cart-icon">
+                        <svg
+                          strokeLinejoin="round"
+                          strokeLinecap="round"
+                          strokeWidth="2"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          height="20"
+                          width="20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <circle r="1" cy="21" cx="9"></circle>
+                          <circle r="1" cy="21" cx="20"></circle>
+                          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                      </span>
+                      Ajouter au panier
+                      <div className="progress-bar"></div>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
