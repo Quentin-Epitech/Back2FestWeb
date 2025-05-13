@@ -51,7 +51,7 @@ const Navbar: React.FC = () => {
     <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-secondary-dark py-2 shadow-md' : 'bg-transparent py-4'}`}>
       <div className="container mx-auto px-4 flex justify-between items-center">
         <div className="flex items-center">
-          <img src="/Rapocalypse-removebg-preview.png" alt="Rapocalypse Logo" className="h-16" />
+          <img src="https://i.imgur.com/0J6YdNd.png" alt="Rapocalypse Logo" className="h-16" />
         </div>
 
       
