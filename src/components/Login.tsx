@@ -12,7 +12,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       await login(email, password);
-      // Redirection après connexion réussie
+      
       window.location.href = '/';
     } catch (err) {
       setError('Email ou mot de passe incorrect');

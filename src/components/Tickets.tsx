@@ -168,7 +168,6 @@ const Tickets: React.FC<TicketsProps> = ({ triggerCartAnim }) => {
             <li>• Accès interdit aux moins de 16 ans non accompagnés</li>
             <li>• L'entrée sur le site est possible dès 12h00 chaque jour</li>
             <li>• Un contrôle de sécurité est effectué à l'entrée du site</li>
-            <li>• Des réductions sont disponibles pour les groupes de 10 personnes ou plus</li>
           </ul>
         </div>
       </div>

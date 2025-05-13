@@ -11,7 +11,7 @@ const Schedule: React.FC = () => {
   ];
 
   const scheduleData = [
-    // Day 1
+    //jour 1
     [
       { time: '16:00', artist: 'Ouverture des portes', stage: 'Scène Principale', description: 'Accueil des festivaliers' },
       { time: '17:00', artist: 'HLD', stage: 'Scène Principale', description: 'Rap français' },
@@ -21,7 +21,7 @@ const Schedule: React.FC = () => {
       { time: '21:00', artist: 'Genezio', stage: 'Scène Principale', description: 'Rap français' },
       { time: '22:00', artist: 'Nono la Grinta', stage: 'Scène Principale', description: 'Rap français' },
     ],
-    // Day 2
+    // jour 2
     [
       { time: '17:00', artist: 'Genezio', stage: 'Scène Principale', description: 'Rap français' },
       { time: '18:00', artist: 'La Mano', stage: 'Scène Principale', description: 'Rap français' },
@@ -62,7 +62,7 @@ const Schedule: React.FC = () => {
           <div className="w-20 h-1 bg-primary mx-auto"></div>
         </div>
 
-        {/* Day Selection */}
+        
         <div className="flex flex-wrap justify-center gap-4 mb-12">
           {days.map((day, index) => (
             <button
@@ -84,7 +84,7 @@ const Schedule: React.FC = () => {
           ))}
         </div>
 
-        {/* Schedule Timeline */}
+        
         <div className="max-w-4xl mx-auto">
           {scheduleData[activeDay].map((item, index) => (
             <div 

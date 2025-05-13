@@ -82,13 +82,13 @@ const Checkout: React.FC = () => {
         }
       }
 
-      // Simuler un paiement
+     
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       clearCart();
       setSuccess(true);
 
-      // Envoi email confirmation
+   
       if (user.email && generatedCodes.length > 0) {
         const functionUrl = import.meta.env.DEV
           ? 'http://localhost:3005/api/send-confirmation'

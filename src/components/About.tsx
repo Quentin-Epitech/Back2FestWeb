@@ -35,10 +35,10 @@ const About: React.FC = () => {
 
         <div className="max-w-3xl mx-auto text-center mb-16">
           <p className="text-lg mb-6">
-            Créé en 2023, Rapocalypse est rapidement devenu un rendez-vous incontournable dans le monde de la musique. Chaque année, nous réunissons les meilleurs artistes nationaux pour trois jours de festival de RAP.
+            Rapocalypse est un festival musicale unique qui rassemble des artistes talentueux et des amateurs passionnés de Rap.
           </p>
           <p className="text-lg">
-            Notre mission est de vous offrir une expérience unique alliant qualité musicale, confort et découvertes artistiques dans un cadre exceptionnel.
+            Notre mission est de vous offrir une expérience unique alliant Rap, confort et découvertes artistiques dans un cadre exceptionnel,comme jamais vu auparavant.
           </p>
         </div>
 

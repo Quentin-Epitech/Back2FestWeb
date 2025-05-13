@@ -5,7 +5,7 @@ const MentionsLegales: React.FC = () => {
   useEffect(() => {
     console.log('Mentions légales component mounted');
     
-    // Faire défiler vers le haut de la page lors du chargement du composant
+    
     window.scrollTo(0, 0);
   }, []);
 

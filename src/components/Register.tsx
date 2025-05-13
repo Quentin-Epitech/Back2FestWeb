@@ -20,7 +20,7 @@ const Register: React.FC = () => {
 
     try {
       await register(email, password, name);
-      // Redirection après inscription réussie
+     
       window.location.href = '/';
     } catch (err) {
       setError('Erreur lors de l\'inscription');

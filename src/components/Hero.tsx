@@ -30,7 +30,7 @@ const Hero: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-12">
             <div className="flex items-center gap-2">
               <Calendar className="text-primary-light" />
-              <span>18 au 20 Juillet 2025</span>
+              <span>18 au 20 Août 2025</span>
             </div>
             <div className="hidden md:block h-6 w-px bg-white/30"></div>
             <div className="flex items-center gap-2">

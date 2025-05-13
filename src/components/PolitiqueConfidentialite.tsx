@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import { Music } from 'lucide-react';
 
-// Utilisation du Layout pour corriger les problèmes d'affichage
 const PolitiqueConfidentialite: React.FC = () => {
   // Log pour debug
   useEffect(() => {
     console.log('Politique de confidentialité component mounted');
     
-    // Faire défiler vers le haut de la page lors du chargement du composant
+
     window.scrollTo(0, 0);
   }, []);
 

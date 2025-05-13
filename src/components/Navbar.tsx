@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
           <img src="/Rapocalypse-removebg-preview.png" alt="Rapocalypse Logo" className="h-16" />
         </div>
 
-        {/* Desktop Menu */}
+      
         <div className="hidden md:flex items-center space-x-6">
           {navLinks.map((link) => (
             <a
@@ -80,7 +80,7 @@ const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Menu Button */}
+       
         <div className="md:hidden">
           <button
             onClick={toggleMenu}
@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      
       {isOpen && (
         <div className="md:hidden bg-secondary-dark">
           <div className="px-4 py-2 space-y-3">

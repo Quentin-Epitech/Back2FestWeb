@@ -9,7 +9,7 @@ const Venue: React.FC = () => {
           <h2 className="text-3xl font-bold text-secondary-dark mb-4">LE LIEU</h2>
           <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
           <p className="max-w-2xl mx-auto text-gray-600">
-            Rapocalypse se déroule dans un cadre exceptionnel à Paris Longchamp, un espace idéal pour profiter pleinement de l'événement.
+            Rapocalypse se déroule dans un cadre exceptionnel à Paris Longchamp, un espace idéal pour profiter pleinement de l'événement dans Paris.
           </p>
         </div>
 
@@ -46,7 +46,7 @@ const Venue: React.FC = () => {
               <div className="p-4 bg-gray-50 rounded flex items-start">
                 <Info className="text-primary mr-2 flex-shrink-0 mt-1" size={20} />
                 <p className="text-sm text-gray-600">
-                  Nous encourageons l'utilisation des transports en commun pour réduire l'impact environnemental de Rapocalypse. Un service de navettes sera également disponible depuis les principales gares parisiennes.
+                  Nous encourageons l'utilisation des transports en commun pour réduire l'impact environnemental de Rapocalypse.
                 </p>
               </div>
             </div>
@@ -70,7 +70,7 @@ const Venue: React.FC = () => {
           <div className="card p-6">
             <h3 className="text-xl font-bold text-secondary-dark mb-4">Hébergement</h3>
             <p className="text-gray-600 mb-4">
-              Des offres spéciales ont été négociées avec plusieurs hôtels à proximité du site de Rapocalypse. Utilisez le code "RAPOCALYPSE2025" lors de votre réservation.
+              Des Hôtels sont disponibles à proximité, notamment dans les quartiers les plus populaires de Paris Longchamp.Nous vous recommandons de prendre vos reservations à l'avance.
             </p>
             <a href="#" className="text-primary font-bold hover:underline">Voir les offres</a>
           </div>
@@ -78,7 +78,7 @@ const Venue: React.FC = () => {
           <div className="card p-6">
             <h3 className="text-xl font-bold text-secondary-dark mb-4">Restauration</h3>
             <p className="text-gray-600 mb-4">
-              Plusieurs espaces de restauration seront disponibles sur le site proposant une variété de cuisines pour tous les goûts et régimes alimentaires.
+              Plusieurs espaces de restauration seront disponibles sur le site proposant une variété de cuisines pour tous les goûts et régimes alimentaires grâce à nos partenaires.
             </p>
             <a href="#" className="text-primary font-bold hover:underline">En savoir plus</a>
           </div>

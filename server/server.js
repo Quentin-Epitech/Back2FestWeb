@@ -7,8 +7,6 @@ const QRCode = require('qrcode');
 const app = express();
 app.use(express.json());
 app.use(cors());
-
-// Initialisation de l'API Resend avec la clé stockée dans .env
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.post('/api/send-confirmation', async (req, res) => {
@@ -19,7 +17,7 @@ app.post('/api/send-confirmation', async (req, res) => {
       return res.status(400).json({ error: 'Données manquantes ou invalides' });
     }
 
-    // Génération de tous les QR codes en parallèle
+    //creation du qr code 
     const qrHtmlBlocks = await Promise.all(
       tickets.map(async (ticket) => {
         if (typeof ticket.code !== 'string') {
@@ -41,7 +39,7 @@ app.post('/api/send-confirmation', async (req, res) => {
       ${qrHtmlBlocks.join('')}
     `;
 
-    // Envoi de l’email
+    //email écrit 
     await resend.emails.send({
       from: 'Back2Fest <onboarding@resend.dev>',
       to: [to],
