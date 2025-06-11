@@ -40,7 +40,7 @@ const Hero: React.FC = () => {
             <div className="hidden md:block h-6 w-px bg-white/30"></div>
             <div className="flex items-center gap-2">
               <Music className="text-primary-light" />
-              <span>+20 Artistes</span>
+              <span>Des Artistes talentueux!</span>
             </div>
           </div>
           
